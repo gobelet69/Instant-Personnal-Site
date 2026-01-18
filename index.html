@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Portfolio | Ultra-Optimized</title>
+    <title>My Portfolio</title>
     <link rel="icon" href="data:,">
     <style>
         :root { --bg: #0a0a0a; --txt: #eee; --card: #1a1a1a; --acc: #00ff41; }
@@ -23,18 +23,32 @@
 <body>
 
     <header>
-        <h1>John Doe</h1>
+        <h1>YOUR NAME HERE</h1>
         <button onclick="document.body.classList.toggle('light')">🌓 Theme</button>
     </header>
 
     <main>
         <section>
-            <p>Fullstack Developer specialized in <b>web performance</b>. I build high-efficiency digital experiences.</p>
+            <p>ADD A SHORT INTRODUCTION ABOUT YOURSELF HERE.</p>
+            
             <div class="grid">
-                <div class="card"><strong>🚀 Project One</strong><p>A minimalist rendering engine.</p><a href="#">Source Code →</a></div>
-                <div class="card"><strong>⚡ Project Two</strong><p>High-performance Micro-API.</p><a href="#">Live Demo →</a></div>
+                <div class="card">
+                    <strong>PROJECT NAME 1</strong>
+                    <p>DESCRIPTION OF YOUR FIRST PROJECT GOES HERE.</p>
+                    <a href="#">Link →</a>
+                </div>
+                <div class="card">
+                    <strong>PROJECT NAME 2</strong>
+                    <p>DESCRIPTION OF YOUR SECOND PROJECT GOES HERE.</p>
+                    <a href="#">Link →</a>
+                </div>
             </div>
-            <p><a href="#">GitHub</a> • <a href="#">LinkedIn</a> • <a href="mailto:hello@example.com">Email Me</a></p>
+
+            <p>
+                <a href="#">GitHub</a> • 
+                <a href="#">LinkedIn</a> • 
+                <a href="mailto:your-email@example.com">Email Me</a>
+            </p>
         </section>
 
         <section id="game-container">
@@ -50,11 +64,12 @@
             This entire page is under <code>14 KB</code>. This is a deliberate performance optimization targeting the <strong>TCP Initial Congestion Window (IW10)</strong>.
         </p>
         <p>
-            By staying below this threshold, the browser receives the full payload (HTML, CSS, JS, and the game) in a single <code>Round-Trip Time (RTT)</code> following the <code>TCP Handshake</code>. This avoids additional network round-trips, resulting in near-instantaneous load times even on slow connections.
+            By staying below this threshold, the browser receives the full payload in a single <code>Round-Trip Time (RTT)</code> following the <code>TCP Handshake</code>. This avoids additional network round-trips, resulting in near-instantaneous load times.
         </p>
     </footer>
 
     <script>
+        // SNAKE GAME ENGINE - NO NEED TO TOUCH THIS
         const c=document.getElementById("g"), x=c.getContext("2d"), s=document.getElementById("s");
         let score=0, sn=[{x:10,y:10}], f={x:15,y:15}, dx=0, dy=0, sz=20, ct=20;
         function draw() {
