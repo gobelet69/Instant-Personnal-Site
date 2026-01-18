@@ -3,378 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dev.Portfolio</title>
+<title>14KB Core</title>
 <style>
-    /* RESET & VARS */
-    :root { 
-        --bg: #050505; --bg-p: #111; --txt: #e0e0e0; --acc: #0f0; --acc-d: #0a0; 
-        --card: rgba(30,30,30,0.7); --font: 'Courier New', monospace;
-    }
-    .light { --bg: #f0f0f0; --bg-p: #fff; --txt: #222; --acc: #00f; --acc-d: #009; --card: rgba(255,255,255,0.8); }
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    :root { --bg: #050505; --p: #0f0; --s: #00f; --t: #f0f; --txt: #cecece; --font: 'Courier New', monospace; }
+    body { background: var(--bg); color: var(--txt); font-family: var(--font); margin: 0; overflow: hidden; height: 100vh; display: grid; grid-template-rows: 60px 1fr 30px; }
     
-    body { background: var(--bg); color: var(--txt); font-family: system-ui, sans-serif; overflow-x: hidden; transition: 0.3s; }
+    /* HEADER */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #333; background: #111; z-index: 10; }
+    h1 { font-size: 1.2rem; margin: 0; letter-spacing: 2px; }
+    .status { font-size: 0.8rem; color: var(--p); animation: blink 2s infinite; }
     
-    /* BACKGROUND CANVAS */
-    #bg-canv { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
+    /* NAV */
+    .nav { display: flex; gap: 5px; }
+    button { background: #222; border: 1px solid #444; color: #fff; padding: 5px 15px; cursor: pointer; font-family: inherit; transition: 0.2s; font-size: 0.8rem; }
+    button:hover, button.active { background: var(--p); color: #000; border-color: var(--p); box-shadow: 0 0 10px var(--p); }
 
-    /* LAYOUT */
-    .container { max-width: 900px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 2px solid var(--acc); margin-bottom: 20px; }
-    h1 { font-family: var(--font); text-transform: uppercase; letter-spacing: -1px; text-shadow: 2px 2px 0 var(--acc-d); }
+    /* MAIN STAGE */
+    main { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    .view { position: absolute; top:0; left:0; width:100%; height:100%; display:none; flex-direction: column; align-items: center; justify-content: center; }
+    .view.active { display: flex; }
     
-    /* CONTROLS */
-    .btn { cursor: pointer; background: var(--acc); color: var(--bg); border: none; padding: 8px 16px; font-weight: bold; font-family: var(--font); clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%); transition: 0.2s; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px var(--acc); }
-    .btn:active { transform: scale(0.95); }
-
-    /* TABS */
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; }
-    .tab-btn { background: transparent; border: 1px solid var(--acc); color: var(--acc); opacity: 0.6; }
-    .tab-btn.active { background: var(--acc); color: var(--bg); opacity: 1; }
+    canvas { background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); border: 1px solid #333; box-shadow: 0 0 30px rgba(0,0,0,0.5); image-rendering: pixelated; max-width: 95%; max-height: 90vh; }
     
-    .panel { display: none; animation: fade 0.3s ease; }
-    .panel.active { display: block; }
-    @keyframes fade { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    /* TERMINAL SPECIFIC */
+    #term-view { align-items: stretch; padding: 20px; background: #000; font-family: monospace; }
+    #term-out { flex: 1; overflow-y: auto; color: #bbb; margin-bottom: 10px; white-space: pre-wrap; }
+    #term-in-wrap { display: flex; border-top: 1px solid #333; padding-top: 10px; }
+    #term-in { background: transparent; border: none; color: var(--p); flex: 1; outline: none; font-family: inherit; font-size: 1rem; }
+    .sys-msg { color: #555; font-style: italic; }
+    .res-ok { color: var(--p); } .res-err { color: #f00; }
 
-    /* GRID & CARDS */
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .card { background: var(--card); backdrop-filter: blur(10px); padding: 20px; border-radius: 10px; border-left: 3px solid var(--acc); transition: 0.3s; transform-style: preserve-3d; }
-    .card:hover { transform: translateY(-5px) rotateX(2deg); border-color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    /* CONTROLS OVERLAY */
+    .overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); padding: 10px; border-radius: 4px; border: 1px solid #444; pointer-events: none; text-align: center; }
+    kbd { background: #333; padding: 2px 5px; border-radius: 3px; border: 1px solid #555; font-size: 0.9em; }
 
-    /* SKILL CHART */
-    .chart-wrap { text-align: center; margin: 20px 0; }
+    footer { background: #111; border-top: 1px solid #333; display: flex; justify-content: space-between; padding: 0 10px; align-items: center; font-size: 0.75rem; color: #666; }
     
-    /* TERMINAL */
-    #term { background: #111; color: #0f0; padding: 20px; border-radius: 5px; font-family: monospace; height: 300px; overflow-y: auto; border: 1px solid #333; box-shadow: inset 0 0 20px #000; }
-    .line { margin-bottom: 5px; } .cursor { animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    /* GAME */
-    #game-ui { text-align: center; }
-    canvas#g { background: rgba(0,0,0,0.5); border: 2px solid var(--acc); margin: 10px auto; display: block; max-width: 100%; box-shadow: 0 0 20px var(--acc-d); }
-
-    footer { margin-top: 50px; font-size: 0.8rem; opacity: 0.7; border-top: 1px solid #333; padding-top: 20px; font-family: monospace; }
+    @keyframes blink { 50% { opacity: 0.5; } }
 </style>
 </head>
 <body>
 
-<canvas id="bg-canv"></canvas>
+<header>
+    <div>
+        <h1>CORE.14KB</h1>
+    </div>
+    <div class="nav">
+        <button onclick="App.switch('cube')" class="active">3D ENGINE</button>
+        <button onclick="App.switch('audio')">SYNTH</button>
+        <button onclick="App.switch('swarm')">PHYSICS</button>
+        <button onclick="App.switch('term')">CONSOLE</button>
+    </div>
+</header>
 
-<div class="container">
-    <header>
-        <h1 id="logo">MAXIMALIST<span style="color:var(--acc)">.14KB</span></h1>
-        <div>
-            <button class="btn" onclick="UI.toggleSound()" id="snd-btn">🔊 ON</button>
-            <button class="btn" onclick="UI.toggleTheme()">🌗</button>
-        </div>
-    </header>
+<main>
+    <div id="cube" class="view active">
+        <canvas id="c3d"></canvas>
+        <div class="overlay">Drag to Rotate • Scroll to Zoom</div>
+    </div>
 
-    <nav class="tabs">
-        <button class="btn tab-btn active" onclick="UI.tab('dash')">DASHBOARD</button>
-        <button class="btn tab-btn" onclick="UI.tab('work')">PROJECTS</button>
-        <button class="btn tab-btn" onclick="UI.tab('term')">TERMINAL</button>
-        <button class="btn tab-btn" onclick="UI.tab('play')">ARCADE</button>
-    </nav>
+    <div id="audio" class="view">
+        <canvas id="cAud"></canvas>
+        <div class="overlay">Press <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> to Play</div>
+    </div>
 
-    <main id="dash" class="panel active">
-        <div class="grid">
-            <div class="card">
-                <h2>System Status</h2>
-                <p><strong>Role:</strong> Full Stack Engineer</p>
-                <p><strong>Loc:</strong> Worldwide / Remote</p>
-                <p><strong>Status:</strong> <span style="color:var(--acc)">Online & Hirable</span></p>
-                <hr style="border:0; border-top:1px solid #444; margin:10px 0">
-                <p>Use the <strong>Terminal</strong> tab for direct kernel access or <strong>Arcade</strong> to test GPU latency.</p>
-            </div>
-            <div class="card chart-wrap">
-                <h3>Skill Matrix</h3>
-                <canvas id="skill-c" width="250" height="250"></canvas>
-            </div>
-        </div>
-    </main>
+    <div id="swarm" class="view">
+        <canvas id="cSwarm"></canvas>
+        <div class="overlay">Move Mouse to Repel • Click to Attract</div>
+    </div>
 
-    <main id="work" class="panel">
-        <div class="grid">
-            <div class="card">
-                <h3>Project Alpha</h3>
-                <p>High-performance rendering engine.</p>
-                <br><small>Tech: WebGL, Rust, WASM</small>
-                <div style="margin-top:10px; text-align:right">
-                    <a href="#" style="color:var(--acc)">Deploy &rarr;</a>
-                </div>
+    <div id="term" class="view" style="justify-content: stretch;">
+        <div id="term-view">
+            <div id="term-out">
+                <div>Welcome to SYSTEM CORE.</div>
+                <div class="sys-msg">Memory: 14KB OK.</div>
+                <div class="sys-msg">GPU: Software Emulation OK.</div>
+                <br>
+                <div>Type 'help' to list commands.</div>
             </div>
-            <div class="card">
-                <h3>Neural Net V2</h3>
-                <p>Client-side prediction algorithms.</p>
-                <br><small>Tech: TensorflowJS, React</small>
-                <div style="margin-top:10px; text-align:right">
-                    <a href="#" style="color:var(--acc)">Deploy &rarr;</a>
-                </div>
-            </div>
-            <div class="card">
-                <h3>14KB Optimizer</h3>
-                <p>The tool that built this site.</p>
-                <br><small>Tech: Vanilla JS, Regex</small>
-                <div style="margin-top:10px; text-align:right">
-                    <a href="#" style="color:var(--acc)">Deploy &rarr;</a>
-                </div>
+            <div id="term-in-wrap">
+                <span style="color:var(--p); margin-right:10px;">root@14kb:~#</span>
+                <input type="text" id="term-in" autocomplete="off" spellcheck="false" autofocus>
             </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <main id="term-panel" class="panel">
-        <div id="term" onclick="document.getElementById('cmd').focus()">
-            <div class="line">Welcome to VisitorOS v1.0.</div>
-            <div class="line">Type 'help' for commands.</div>
-            <div id="history"></div>
-            <div class="line" style="display:flex">
-                <span style="color:var(--acc)">visitor@web:~$</span>&nbsp;
-                <input type="text" id="cmd" style="background:transparent; border:none; color:white; font-family:monospace; flex-grow:1; outline:none;" autocomplete="off">
-            </div>
-        </div>
-    </main>
-
-    <main id="play" class="panel">
-        <div id="game-ui">
-            <h2>CYBER-SNAKE</h2>
-            <p>Score: <span id="score" style="color:var(--acc); font-size:1.5em">0</span> | High: <span id="hi">0</span></p>
-            <canvas id="g" width="400" height="400"></canvas>
-            <p><small>Arrows to Move. Eat glitches.</small></p>
-            <button class="btn" onclick="Game.init()" style="margin-top:10px">RESTART SYSTEM</button>
-        </div>
-    </main>
-
-    <footer>
-        <p>
-            <strong>Optimization Metrics:</strong><br>
-            Payload: &lt;14KB (Gzipped &lt;5KB) • TTI: &lt;50ms • <span style="color:var(--acc)">TCP IW10 Compliant</span>
-        </p>
-    </footer>
-</div>
+<footer>
+    <span>TCP IW10 OPTIMIZED</span>
+    <span class="status">● SYSTEM ACTIVE</span>
+</footer>
 
 <script>
-/** * ULTRA-COMPACT JS ENGINE 
- * Includes: Audio Synth, Canvas Particles, Game Physics, Charting, Terminal
+/**
+ * THE CORE ENGINE
+ * Contains: 3D Math, Audio Context, Particle Physics, Command Parser
  */
 
-const $ = id => document.getElementById(id);
-const R = (min, max) => Math.random() * (max - min) + min;
+const $ = i => document.getElementById(i);
+const R = (m,x) => Math.random()*(x-m)+m;
 
-// --- AUDIO SYNTH (Web Audio API) ---
-const Aud = {
-    ctx: new (window.AudioContext || window.webkitAudioContext)(),
-    on: true,
-    play(freq, type='sine', dur=0.1) {
-        if (!this.on) return;
-        const o = this.ctx.createOscillator();
-        const g = this.ctx.createGain();
-        o.type = type; o.frequency.value = freq;
-        o.connect(g); g.connect(this.ctx.destination);
-        o.start();
-        g.gain.exponentialRampToValueAtTime(0.00001, this.ctx.currentTime + dur);
-        o.stop(this.ctx.currentTime + dur);
-    }
-};
-
-// --- UI CONTROLLER ---
-const UI = {
-    tab(id) {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        $(id).classList.add('active');
-        event.target.classList.add('active');
-        Aud.play(400, 'triangle', 0.05);
-        if(id === 'play') Game.focus();
-    },
-    toggleTheme() {
-        document.body.classList.toggle('light');
-        Aud.play(200, 'square', 0.1);
-    },
-    toggleSound() {
-        Aud.on = !Aud.on;
-        $('snd-btn').innerText = Aud.on ? "🔊 ON" : "🔇 OFF";
-    }
-};
-
-// --- BACKGROUND PARTICLES ---
-const Bg = {
-    c: $('bg-canv'),
-    ctx: $('bg-canv').getContext('2d'),
-    pts: [],
+const App = {
+    mode: 'cube',
+    w: 0, h: 0,
     init() {
         this.resize();
-        window.addEventListener('resize', () => this.resize());
-        for(let i=0; i<60; i++) this.pts.push({x: R(0,this.w), y: R(0,this.h), vx: R(-0.5,0.5), vy: R(-0.5,0.5)});
+        window.onresize = () => this.resize();
         this.loop();
-    },
-    resize() { this.c.width=this.w=window.innerWidth; this.c.height=this.h=window.innerHeight; },
-    loop() {
-        this.ctx.clearRect(0,0,this.w,this.h);
-        this.ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--acc');
-        this.ctx.strokeStyle = this.ctx.fillStyle;
         
-        this.pts.forEach((p, i) => {
-            p.x += p.vx; p.y += p.vy;
-            if(p.x<0 || p.x>this.w) p.vx*=-1;
-            if(p.y<0 || p.y>this.h) p.vy*=-1;
-            this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 2, 0, Math.PI*2); this.ctx.fill();
-            
-            // Connect lines
-            for(let j=i+1; j<this.pts.length; j++) {
-                let p2 = this.pts[j];
-                let d = Math.hypot(p.x-p2.x, p.y-p2.y);
-                if(d < 150) {
-                    this.ctx.globalAlpha = 1 - d/150;
-                    this.ctx.beginPath(); this.ctx.moveTo(p.x,p.y); this.ctx.lineTo(p2.x,p2.y); this.ctx.stroke();
-                }
+        // Input handling
+        $('term-in').addEventListener('keydown', e => {
+            if(e.key === 'Enter') Term.exec(e.target.value);
+        });
+        
+        window.addEventListener('keydown', e => Synth.play(e.key));
+        
+        // Mouse for 3D and Swarm
+        window.addEventListener('mousemove', e => {
+            Swarm.mx = e.clientX; Swarm.my = e.clientY - 60; // offset header
+            if(e.buttons === 1 && this.mode === 'cube') {
+                Cube.rot.y += e.movementX * 0.01;
+                Cube.rot.x += e.movementY * 0.01;
             }
         });
+        window.addEventListener('mousedown', () => Swarm.repel = false);
+        window.addEventListener('mouseup', () => Swarm.repel = true);
+        window.addEventListener('wheel', e => Cube.z += e.deltaY * 0.1);
+    },
+    switch(m) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        $(m).classList.add('active');
+        // Find button that triggered this
+        const btn = Array.from(document.querySelectorAll('button')).find(b => b.getAttribute('onclick').includes(m));
+        if(btn) btn.classList.add('active');
+        
+        this.mode = m;
+        if(m==='term') $('term-in').focus();
+        this.resize();
+    },
+    resize() {
+        const b = document.querySelector('main').getBoundingClientRect();
+        this.w = b.width; this.h = b.height;
+        ['c3d', 'cAud', 'cSwarm'].forEach(id => {
+            const c = $(id); c.width = this.w; c.height = this.h;
+        });
+        Cube.init(); Swarm.init();
+    },
+    loop() {
         requestAnimationFrame(() => this.loop());
+        if(this.mode === 'cube') Cube.render();
+        if(this.mode === 'audio') Synth.vis();
+        if(this.mode === 'swarm') Swarm.render();
     }
 };
-Bg.init();
 
-// --- SKILL CHART (Radar) ---
-const Chart = {
+// --- MODULE 1: 3D WIREFRAME ENGINE (No Libraries) ---
+const Cube = {
+    v: [], e: [], rot: {x:0.5, y:0.5}, z: 500,
+    ctx: $('c3d').getContext('2d'),
     init() {
-        const c = $('skill-c'), x = c.getContext('2d'), w=250, h=250;
-        const data = [0.9, 0.7, 0.8, 0.6, 0.95, 0.8]; // Skill levels
-        const labs = ['JS', 'Rust', 'CSS', 'AWS', 'HTML', 'UI'];
-        const cx=w/2, cy=h/2, r=90;
-        
-        x.font = "12px monospace"; x.textAlign="center"; x.textBaseline="middle";
-        x.strokeStyle = "#444"; x.fillStyle="#0f0";
-        
-        // Grid
-        for(let i=1; i<=4; i++) {
-            x.beginPath();
-            for(let j=0; j<6; j++) {
-                const a = j * Math.PI/3;
-                x[j==0?'moveTo':'lineTo'](cx + Math.cos(a)*r*(i/4), cy + Math.sin(a)*r*(i/4));
+        // Create Icosahedron vertices roughly
+        const t = (1 + Math.sqrt(5)) / 2 * 50;
+        const v = [[-50,t,0],[50,t,0],[-50,-t,0],[50,-t,0],[0,-50,t],[0,50,t],[0,-50,-t],[0,50,-t],[t,0,-50],[t,0,50],[-t,0,-50],[-t,0,50]];
+        this.v = v.map(p => ({x:p[0], y:p[1], z:p[2]}));
+        // Connect all close vertices
+        this.e = [];
+        for(let i=0; i<this.v.length; i++) {
+            for(let j=i+1; j<this.v.length; j++) {
+                const d = Math.hypot(this.v[i].x-this.v[j].x, this.v[i].y-this.v[j].y, this.v[i].z-this.v[j].z);
+                if(d < 120) this.e.push([i, j]);
             }
-            x.closePath(); x.stroke();
         }
-
-        // Data
-        x.beginPath(); x.strokeStyle = getComputedStyle(document.body).getPropertyValue('--acc');
-        x.lineWidth=2;
-        data.forEach((v, i) => {
-            const a = i * Math.PI/3;
-            x[i==0?'moveTo':'lineTo'](cx + Math.cos(a)*r*v, cy + Math.sin(a)*r*v);
-            // Labels
-            x.fillText(labs[i], cx + Math.cos(a)*(r+20), cy + Math.sin(a)*(r+20));
+    },
+    project(x,y,z) {
+        // 3D Rotation Math
+        let x1 = x*Math.cos(this.rot.y) - z*Math.sin(this.rot.y);
+        let z1 = z*Math.cos(this.rot.y) + x*Math.sin(this.rot.y);
+        let y1 = y*Math.cos(this.rot.x) - z1*Math.sin(this.rot.x);
+        let z2 = z1*Math.cos(this.rot.x) + y*Math.sin(this.rot.x);
+        
+        // Perspective Projection
+        const f = 400 / (z2 + this.z);
+        return { x: x1*f + App.w/2, y: y1*f + App.h/2 };
+    },
+    render() {
+        const c = this.ctx;
+        c.fillStyle = '#000'; c.fillRect(0,0,App.w,App.h);
+        
+        // Auto rotate
+        this.rot.y += 0.005; 
+        
+        c.beginPath();
+        c.strokeStyle = '#0f0';
+        this.e.forEach(edge => {
+            const p1 = this.project(this.v[edge[0]].x, this.v[edge[0]].y, this.v[edge[0]].z);
+            const p2 = this.project(this.v[edge[1]].x, this.v[edge[1]].y, this.v[edge[1]].z);
+            c.moveTo(p1.x, p1.y); c.lineTo(p2.x, p2.y);
         });
-        x.closePath(); x.stroke(); 
-        x.fillStyle = x.strokeStyle; x.globalAlpha=0.2; x.fill();
+        c.stroke();
+        
+        // Nodes
+        c.fillStyle = '#fff';
+        this.v.forEach(v => {
+            const p = this.project(v.x, v.y, v.z);
+            c.fillRect(p.x-2, p.y-2, 4, 4);
+        });
     }
 };
-setTimeout(Chart.init, 500); // Wait for styles
 
-// --- SNAKE GAME ---
-const Game = {
-    c: $('g'), x: $('g').getContext('2d'),
-    sn: [], f: {}, d: {x:0,y:0}, sc: 0, run: false, parts: [],
-    
-    init() {
-        this.sn=[{x:10,y:10}]; this.f={x:15,y:15}; this.d={x:1,y:0}; this.sc=0; this.run=true;
-        $('score').innerText=0;
-        if(!this.int) this.int = setInterval(()=>this.loop(), 80);
+// --- MODULE 2: AUDIO SYNTH & VISUALIZER ---
+const Synth = {
+    ctx: null, an: null, 
+    keys: {'a':261.6,'s':293.6,'d':329.6,'f':349.2,'g':392.0,'h':440.0,'j':493.8},
+    setup() {
+        if(this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.an = this.ctx.createAnalyser();
+        this.an.connect(this.ctx.destination);
     },
-    loop() {
-        if(!this.run) return;
+    play(k) {
+        if(!this.keys[k]) return;
+        this.setup();
+        const o = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.value = this.keys[k];
+        o.connect(g); g.connect(this.an);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.5);
+        o.stop(this.ctx.currentTime + 0.5);
+    },
+    vis() {
+        const c = $('cAud').getContext('2d');
+        c.fillStyle = 'rgba(0,0,0,0.2)'; c.fillRect(0,0,App.w,App.h); // Trail effect
+        if(!this.an) return;
         
-        // Physics
-        let h = {x: this.sn[0].x + this.d.x, y: this.sn[0].y + this.d.y};
-        if(h.x<0) h.x=19; if(h.x>19) h.x=0; if(h.y<0) h.y=19; if(h.y>19) h.y=0;
+        const arr = new Uint8Array(this.an.frequencyBinCount);
+        this.an.getByteTimeDomainData(arr);
         
-        // Collision Self
-        if(this.sn.some(s => s.x === h.x && s.y === h.y)) {
-            this.run = false; Aud.play(150, 'sawtooth', 0.5); return;
+        c.lineWidth = 2; c.strokeStyle = '#0ff'; c.beginPath();
+        const slice = App.w * 1.0 / arr.length;
+        let x = 0;
+        for(let i=0; i<arr.length; i++) {
+            const v = arr[i] / 128.0;
+            const y = v * App.h/2;
+            if(i===0) c.moveTo(x,y); else c.lineTo(x,y);
+            x += slice;
         }
-        
-        this.sn.unshift(h);
-        
-        // Eat
-        if(h.x === this.f.x && h.y === this.f.y) {
-            this.sc++; $('score').innerText = this.sc;
-            if(this.sc > parseInt($('hi').innerText)) $('hi').innerText = this.sc;
-            this.f = {x:Math.floor(Math.random()*20), y:Math.floor(Math.random()*20)};
-            this.explode(h.x*20+10, h.y*20+10);
-            Aud.play(600 + (this.sc*10), 'sine', 0.1);
-        } else {
-            this.sn.pop();
-        }
-        
-        // Render
-        this.x.fillStyle = "#000"; this.x.fillRect(0,0,400,400);
-        
-        // Grid lines (retro feel)
-        this.x.strokeStyle="#222"; this.x.beginPath();
-        for(let i=0;i<400;i+=20) { this.x.moveTo(i,0);this.x.lineTo(i,400); this.x.moveTo(0,i);this.x.lineTo(400,i); }
-        this.x.stroke();
-
-        this.x.fillStyle = getComputedStyle(document.body).getPropertyValue('--acc');
-        this.sn.forEach(p => this.x.fillRect(p.x*20+1, p.y*20+1, 18, 18));
-        
-        this.x.fillStyle = "#f05";
-        this.x.beginPath(); this.x.arc(this.f.x*20+10, this.f.y*20+10, 8, 0, Math.PI*2); this.x.fill();
-
-        this.parts.forEach((p,i) => {
-            p.x+=p.vx; p.y+=p.vy; p.a-=0.05;
-            this.x.fillStyle=`rgba(255,255,255,${p.a})`;
-            this.x.fillRect(p.x,p.y,4,4);
-            if(p.a<=0) this.parts.splice(i,1);
-        });
-    },
-    explode(x,y) {
-        for(let i=0; i<10; i++) this.parts.push({x, y, vx:R(-5,5), vy:R(-5,5), a:1});
-    },
-    key(e) {
-        if([37,38,39,40].includes(e.keyCode)) e.preventDefault();
-        const k=e.keyCode;
-        if(k==37 && this.d.x==0) this.d={x:-1,y:0};
-        if(k==38 && this.d.y==0) this.d={x:0,y:-1};
-        if(k==39 && this.d.x==0) this.d={x:1,y:0};
-        if(k==40 && this.d.y==0) this.d={x:0,y:1};
-    },
-    focus() { if(!this.run) this.init(); }
+        c.stroke();
+    }
 };
-window.onkeydown = (e) => Game.key(e);
 
-// --- TERMINAL ---
+// --- MODULE 3: PHYSICS SWARM ---
+const Swarm = {
+    p: [], mx: -100, my: -100, repel: true,
+    init() {
+        this.p = [];
+        for(let i=0; i<200; i++) this.p.push({x:R(0,App.w), y:R(0,App.h), vx:R(-2,2), vy:R(-2,2)});
+    },
+    render() {
+        const c = $('cSwarm').getContext('2d');
+        c.clearRect(0,0,App.w,App.h);
+        c.fillStyle = this.repel ? '#f0f' : '#0ff';
+        
+        this.p.forEach(p => {
+            // Physics
+            p.x += p.vx; p.y += p.vy;
+            
+            // Mouse Interaction
+            const dx = p.x - this.mx, dy = p.y - this.my;
+            const dist = Math.hypot(dx, dy);
+            if(dist < 150) {
+                const f = this.repel ? 50/dist : -50/dist;
+                p.vx += (dx/dist)*f; p.vy += (dy/dist)*f;
+            }
+            
+            // Friction & Bounds
+            p.vx *= 0.95; p.vy *= 0.95;
+            if(p.x<0) p.x=App.w; if(p.x>App.w) p.x=0;
+            if(p.y<0) p.y=App.h; if(p.y>App.h) p.y=0;
+            
+            c.fillRect(p.x, p.y, 2, 2);
+        });
+        
+        // Draw Mouse Cursor halo
+        c.strokeStyle = '#333'; c.beginPath(); c.arc(this.mx, this.my, 20, 0, 6.28); c.stroke();
+    }
+};
+
+// --- MODULE 4: TERMINAL ---
 const Term = {
-    in: $('cmd'),
-    hist: $('history'),
-    cmds: {
-        help: "Available: help, whoami, contact, clear, date, sudo",
-        whoami: "User: Guest | Privileges: None",
-        contact: "Email: dev@example.com | GitHub: @dev",
-        date: () => new Date().toString(),
-        clear: () => { $('history').innerHTML=""; return ""; },
-        sudo: "Nice try. Permission denied."
-    },
-    init() {
-        this.in.addEventListener('keydown', (e) => {
-            if(e.key === 'Enter') {
-                const val = this.in.value.trim().toLowerCase();
-                this.print(`visitor@web:~$ ${val}`);
-                let res = this.cmds[val] ? (typeof this.cmds[val] === 'function' ? this.cmds[val]() : this.cmds[val]) : `Command not found: ${val}`;
-                if(res) this.print(res, '#ccc');
-                this.in.value = "";
-                $('term').scrollTop = $('term').scrollHeight;
-                Aud.play(800, 'square', 0.05);
-            }
-        });
-    },
-    print(txt, col) {
+    out: $('term-out'),
+    in: $('term-in'),
+    fs: { 'readme.txt': 'Build interactive systems.', 'secret.dat': '0x4421' },
+    log(txt, cls='') {
         const d = document.createElement('div');
-        d.className = 'line'; d.innerText = txt; 
-        if(col) d.style.color = col;
-        this.hist.appendChild(d);
+        d.textContent = txt; d.className = cls;
+        this.out.appendChild(d);
+        this.out.scrollTop = this.out.scrollHeight;
+    },
+    exec(cmd) {
+        cmd = cmd.trim();
+        this.log(`root@14kb:~# ${cmd}`, 'sys-msg');
+        this.in.value = '';
+        
+        const args = cmd.split(' ');
+        const c = args[0].toLowerCase();
+        
+        switch(c) {
+            case 'help': this.log('CMDS: help, clear, ls, cat [file], date, matrix, reboot'); break;
+            case 'clear': this.out.innerHTML = ''; break;
+            case 'date': this.log(new Date().toString(), 'res-ok'); break;
+            case 'ls': this.log(Object.keys(this.fs).join('  '), 'res-ok'); break;
+            case 'cat': 
+                if(this.fs[args[1]]) this.log(this.fs[args[1]], 'res-ok'); 
+                else this.log('File not found', 'res-err');
+                break;
+            case 'reboot': location.reload(); break;
+            case 'matrix':
+                this.log('Wake up, Neo...', 'res-ok');
+                setTimeout(()=>this.log('The Matrix has you...'), 1000);
+                setTimeout(()=>this.log('Follow the white rabbit.'), 2000);
+                break;
+            default: this.log(`bash: ${c}: command not found`, 'res-err');
+        }
     }
 };
-Term.init();
+
+// BOOT
+App.init();
 
 </script>
 </body>
