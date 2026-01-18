@@ -2,83 +2,69 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Site personnel ultra-léger">
-    <title>Nom Prénom | Portfolio</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
-    
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Nom | Dev & Snake</title>
+    <link rel="icon" href="data:,">
     <style>
-        /* CSS Critique Inlined */
-        :root {
-            --bg: #ffffff;
-            --txt: #222;
-            --link: #0070f3;
-            --sans: system-ui, -apple-system, sans-serif;
-        }
-        @media (prefers-color-scheme: dark) {
-            :root { --bg: #111; --txt: #eee; --link: #3291ff; }
-        }
-        body {
-            font-family: var(--sans);
-            line-height: 1.6;
-            max-width: 650px;
-            margin: 40px auto;
-            padding: 0 20px;
-            background: var(--bg);
-            color: var(--txt);
-        }
-        h1 { line-height: 1.2; margin-bottom: 0.5rem; }
-        a { color: var(--link); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 10px; }
-        footer { margin-top: 50px; font-size: 0.9em; opacity: 0.7; }
-        .grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 2rem; }
-        .card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; flex: 1 1 250px; }
+        :root{--b:#111;--t:#eee;--a:#0f3}
+        body{font-family:system-ui,sans-serif;background:var(--b);color:var(--t);max-width:600px;margin:20px auto;padding:0 20px;line-height:1.4}
+        a{color:var(--a)}
+        canvas{display:block;margin:20px auto;background:#000;border:2px solid #333;touch-action:none;width:100%;max-width:400px}
+        .stats{text-align:center;font-weight:bold;color:var(--a)}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Jean Dupont</h1>
-        <p>Développeur Fullstack & Passionné de Performance Web.</p>
-    </header>
+    <h1>Jean Dupont</h1>
+    <p>Développeur minimaliste. Score Snake : <span id="s" class="stats">0</span></p>
 
-    <main>
-        <section>
-            <h2>À propos</h2>
-            <p>J'optimise des expériences numériques pour qu'elles soient rapides, accessibles et durables.</p>
-        </section>
+    <canvas id="g" width="400" height="400"></canvas>
 
-        <section>
-            <h2>Projets</h2>
-            <div class="grid">
-                <div class="card">
-                    <strong>Projet A</strong>
-                    <p>Une application de gestion de budget en Go/React.</p>
-                    <a href="#">Voir le code →</a>
-                </div>
-                <div class="card">
-                    <strong>Projet B</strong>
-                    <p>Moteur de rendu CSS écrit en Rust.</p>
-                    <a href="#">Démo live →</a>
-                </div>
-            </div>
-        </section>
+    <div class="grid">
+        <div><strong>Contact</strong><br><a href="#">Email</a></div>
+        <div><strong>Projets</strong><br><a href="#">GitHub</a></div>
+    </div>
 
-        <section>
-            <h2>Contact</h2>
-            <ul>
-                <li>Email : <a href="mailto:hello@example.com">hello@example.com</a></li>
-                <li>GitHub : <a href="#">@username</a></li>
-                <li>LinkedIn : <a href="#">/in/username</a></li>
-            </ul>
-        </section>
-    </main>
+    <script>
+        const c=document.getElementById("g"), x=c.getContext("2d"), s=document.getElementById("s");
+        let score=0, sn=[{x:10,y:10}], f={x:15,y:15}, dx=0, dy=0, size=20, count=20;
 
-    <footer>
-        <p>&copy; 2026 - Propulsé par la règle des 14 Ko.</p>
-    </footer>
+        function draw() {
+            // Déplacement
+            let head = {x: sn[0].x + dx, y: sn[0].y + dy};
+            
+            // Mur (wrap around)
+            if(head.x<0) head.x=count-1; if(head.x>=count) head.x=0;
+            if(head.y<0) head.y=count-1; if(head.y>=count) head.y=0;
 
+            sn.unshift(head);
+
+            // Manger la pomme
+            if(head.x===f.x && head.y===f.y) {
+                score++; s.innerText=score;
+                f={x:Math.floor(Math.random()*count), y:Math.floor(Math.random()*count)};
+            } else {
+                if(dx!==0 || dy!==0) sn.pop();
+            }
+
+            // Dessin
+            x.fillStyle="black"; x.fillRect(0,0,c.width,c.height);
+            x.fillStyle="#0f3"; sn.forEach(p=>x.fillRect(p.x*size, p.y*size, size-1, size-1));
+            x.fillStyle="red"; x.fillRect(f.x*size, f.y*size, size-1, size-1);
+
+            // Auto-collision (Game Over reset)
+            for(let i=1; i<sn.length; i++) {
+                if(head.x===sn[i].x && head.y===sn[i].y) { sn=[{x:10,y:10}]; dx=dy=score=0; s.innerText=0; }
+            }
+        }
+
+        window.onkeydown = e => {
+            if(e.keyCode==37 && dx==0) {dx=-1;dy=0} else if(e.keyCode==38 && dy==0) {dx=0;dy=-1}
+            else if(e.keyCode==39 && dx==0) {dx=1;dy=0} else if(e.keyCode==40 && dy==0) {dx=0;dy=1}
+        };
+
+        setInterval(draw, 100);
+    </script>
 </body>
 </html>
