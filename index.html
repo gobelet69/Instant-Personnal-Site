@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Site personnel ultra-léger">
+    <title>Nom Prénom | Portfolio</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    
+    <style>
+        /* CSS Critique Inlined */
+        :root {
+            --bg: #ffffff;
+            --txt: #222;
+            --link: #0070f3;
+            --sans: system-ui, -apple-system, sans-serif;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #111; --txt: #eee; --link: #3291ff; }
+        }
+        body {
+            font-family: var(--sans);
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: var(--bg);
+            color: var(--txt);
+        }
+        h1 { line-height: 1.2; margin-bottom: 0.5rem; }
+        a { color: var(--link); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        footer { margin-top: 50px; font-size: 0.9em; opacity: 0.7; }
+        .grid { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 2rem; }
+        .card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; flex: 1 1 250px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Jean Dupont</h1>
+        <p>Développeur Fullstack & Passionné de Performance Web.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>À propos</h2>
+            <p>J'optimise des expériences numériques pour qu'elles soient rapides, accessibles et durables.</p>
+        </section>
+
+        <section>
+            <h2>Projets</h2>
+            <div class="grid">
+                <div class="card">
+                    <strong>Projet A</strong>
+                    <p>Une application de gestion de budget en Go/React.</p>
+                    <a href="#">Voir le code →</a>
+                </div>
+                <div class="card">
+                    <strong>Projet B</strong>
+                    <p>Moteur de rendu CSS écrit en Rust.</p>
+                    <a href="#">Démo live →</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Contact</h2>
+            <ul>
+                <li>Email : <a href="mailto:hello@example.com">hello@example.com</a></li>
+                <li>GitHub : <a href="#">@username</a></li>
+                <li>LinkedIn : <a href="#">/in/username</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 - Propulsé par la règle des 14 Ko.</p>
+    </footer>
+
+</body>
+</html>
